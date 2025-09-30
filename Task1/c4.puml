@@ -1,0 +1,54 @@
+@startuml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+
+
+Person(users, "Бизнес-пользователи", "Сотрудники компании, аналитики")
+Person(operators, "Операторы клиник", "Медицинский персонал")
+Person(clients, "Клиенты", "Пациенты и держатели карт")
+
+System_Boundary(future_system, "Будущее 2.0") {
+    Container(data_portal, "Витрина данных", "Web Portal", "Портал самообслуживания для создания отчетов")
+    Container(api_gateway, "API Gateway", "Kong/Nginx", "Единая точка входа для всех API")
+
+    Container_Boundary(data_platform, "Платформа данных") {
+        Container(data_lake, "Data Lake", "S3/MinIO", "Хранение сырых данных всех форматов")
+        Container(dwh_new, "Новое DWH", "Snowflake/BigQuery", "Современное хранилище структурированных данных")
+        Container(data_streaming, "Потоковая обработка", "Kafka/Pulsar", "Обработка данных в реальном времени")
+        Container(etl_platform, "ETL Платформа", "Airflow/Dagster", "Оркестрация процессов обработки данных")
+    }
+
+    Container_Boundary(domain_services, "Доменные сервисы") {
+        Container(medical_api, "Медицинские API", "Java/Python", "Сервисы медицинских данных")
+        Container(fintech_api, "Финтех API", "Golang/Java", "Банковские и финансовые сервисы")
+        Container(ai_platform, "AI Платформа", "Python/ML", "Сервисы машинного обучения")
+        Container(analytics_api, "Аналитические API", "Python/Scala", "Сервисы аналитики и отчетности")
+    }
+
+    Container(identity_service, "Сервис идентификации", "OAuth2/LDAP", "Управление пользователями и доступом")
+    Container(notification_service, "Сервис уведомлений", "Node.js/Python", "Отправка уведомлений")
+}
+
+System_Ext(legacy_dwh, "Legacy DWH", "Старое хранилище (поэтапный вывод)")
+System_Ext(external_systems, "Внешние системы", "Фармацевтические компании, медоборудование")
+
+Rel(users, data_portal, "Создает отчеты")
+Rel(operators, medical_api, "Ввод медицинских данных")
+Rel(clients, fintech_api, "Финансовые операции")
+
+Rel(data_portal, api_gateway, "HTTPS/REST запросы")
+Rel(api_gateway, analytics_api, "Вызовы API")
+Rel(api_gateway, identity_service, "Аутентификация")
+
+Rel(analytics_api, dwh_new, "SQL запросы")
+Rel(medical_api, data_streaming, "События")
+Rel(fintech_api, data_streaming, "Транзакции")
+Rel(ai_platform, data_lake, "Данные для обучения ML")
+
+Rel(data_streaming, data_lake, "Сохранение событий")
+Rel(etl_platform, data_lake, "Обработка данных")
+Rel(etl_platform, dwh_new, "Загрузка структурированных данных")
+Rel(etl_platform, legacy_dwh, "Миграция данных", "Этап миграции")
+
+Rel(domain_services, external_systems, "Интеграция", "Будущие интеграции")
+
+@enduml

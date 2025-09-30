@@ -1,0 +1,36 @@
+@startuml
+skinparam monochrome true
+skinparam dpi 150
+skinparam defaultTextAlignment center
+skinparam ArrowColor Black
+skinparam ArrowThickness 1.2
+skinparam linetype ortho
+
+rectangle "Медицинский домен" as Healthcare
+rectangle "Финтех домен" as Fintech
+rectangle "Аналитический домен" as Analytics
+rectangle "Операционный домен" as Operations
+rectangle "Интеграционный домен" as Integration
+
+rectangle "Внешние системы\n(Фарма, оборудование)" as External
+rectangle "Клиентские приложения" as Clients
+
+rectangle "Платформа данных" as DataPlatform
+
+Integration <--> Healthcare : Медицинские данные
+Integration <--> Fintech : Финансовые данные
+Integration <--> Operations : Операционные данные
+Integration <--> Analytics : Аналитические запросы
+
+Healthcare -down-> DataPlatform : События диагностики
+Fintech -down-> DataPlatform : Финансовые транзакции
+Operations -down-> DataPlatform : Кадровые и операционные данные
+
+DataPlatform -up-> Analytics : Обработанные данные
+
+Integration <--> External : Интеграция внешних систем
+Integration --> DataPlatform : Внешние данные
+
+Clients <--> Integration : API запросы
+
+@enduml
